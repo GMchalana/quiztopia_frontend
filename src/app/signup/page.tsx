@@ -4,6 +4,7 @@ import Image from 'next/image';
 import signup from '../../assets/login.webp';
 import logo from '../../assets/logo.png';
 import { useState } from 'react';
+import { FiEye, FiEyeOff } from 'react-icons/fi'; // Import eye icons from react-icons
 
 export default function SignupPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function SignupPage() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   const handleInputChange = (e : any) => {
     const { id, value } = e.target;
@@ -23,6 +25,11 @@ export default function SignupPage() {
       ...prev,
       [id]: value
     }));
+  };
+
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleUserTypeChange = (type : any) => {
@@ -134,7 +141,7 @@ export default function SignupPage() {
                 />
               </div>
 
-              <div className="mb-8">
+              {/* <div className="mb-8">
                 <input 
                   type="password" 
                   id="password"
@@ -145,7 +152,30 @@ export default function SignupPage() {
                   required
                   minLength={6}
                 />
+              </div> */}
+
+              <div className="mb-8 relative">
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Your Password" 
+                  className="w-full p-3 bg-[#292732] focus:outline-none focus:border-gray-600 transition-colors rounded-sm pr-10"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#888990] hover:text-[#F7CA21] focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
               </div>
+
+
 
               <div className="text-center w-full mt-8">
                 <button 
@@ -162,7 +192,7 @@ export default function SignupPage() {
             <p className="text-md font-Inter mb-8 text-center text-[#888990]">
               Already have an account?{' '}
               <button
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/')}
                 className="text-[#F7CA21] hover:text-[#fce280] cursor-pointer"
               >
                 Login here
