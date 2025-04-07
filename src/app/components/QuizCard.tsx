@@ -38,7 +38,7 @@ export default function QuizCard({ title, questionCount }: QuizCardProps) {
           {/* View Answers button (center) */}
           <Link 
             href="#" 
-            className="inline-block px-4 py-2 bg-[#E6E6E666] text-black font-medium rounded hover:bg-[#fce280] transition-colors"
+            className="inline-block px-4 py-2 bg-[#E6E6E666] text-black rounded hover:bg-[#fce280] transition-colors"
           >
             View Answers
           </Link>
