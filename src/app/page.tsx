@@ -15,6 +15,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 
   const handleInputChange = (e : any) => {
     const { id, value } = e.target;
@@ -34,7 +36,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3333/api/auth/login', {
+      const response = await fetch(`${baseUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +57,7 @@ export default function LoginPage() {
       if (data.token) {
         localStorage.setItem('authToken', data.token);
       }
-      router.push('/dashboard'); // Redirect to dashboard or home page
+      router.push('/instructor/dashboard'); // Redirect to dashboard or home page
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Login error:', err);
