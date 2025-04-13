@@ -60,9 +60,8 @@ export default function SideNav() {
       icon: faQuestionCircle, 
       label: 'Quiz Builder',
       children: [
-        { href: '/instructor/quizes/auto-graded-quize', icon: faPlus, label: 'Create Quiz' },
-        { href: '/quizzes/templates', icon: faLayerGroup, label: 'Templates' },
-        { href: '/quizzes/library', icon: faBook, label: 'Library' }
+        { href: '/instructor/quizes/auto-graded-quize', icon: faPlus, label: 'Auto Graded Quiz' },
+        { href: '/instructor/quizes/manual-graded-quize', icon: faLayerGroup, label: 'Manual Graded Quiz' }
       ]
     },
     // Add more items as needed

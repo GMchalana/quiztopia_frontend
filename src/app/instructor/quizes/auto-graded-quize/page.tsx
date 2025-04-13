@@ -18,6 +18,7 @@ export default function AutoGradedQuiz() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [showQuestionTypeSelector, setShowQuestionTypeSelector] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const addQuestion = (type: 'multiple-choice' | 'true-false') => {
     const newQuestion: Question = {
@@ -69,16 +70,61 @@ export default function AutoGradedQuiz() {
     }
   };
 
-  const saveQuiz = () => {
-    if (quizName.trim() && questions.length > 0) {
-      console.log({
+//   const saveQuiz = () => {
+//     if (quizName.trim() && questions.length > 0) {
+//       console.log({
+//         quizName,
+//         timeEstimate,
+//         questions,
+//       });
+//       alert('Quiz saved and published successfully!');
+//     } else {
+//       alert('Please add at least one question and provide a quiz name');
+//     }
+//   };
+
+
+
+const saveQuiz = async () => {
+    try {
+      if (!quizName.trim() || questions.length === 0) {
+        alert('Please add at least one question and provide a quiz name');
+        return;
+      }
+  
+      const quizData = {
         quizName,
         timeEstimate,
-        questions,
+        questions
+      };
+  
+      const response = await fetch(`${baseUrl}/modules/quizzes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(quizData),
       });
-      alert('Quiz saved and published successfully!');
-    } else {
-      alert('Please add at least one question and provide a quiz name');
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        alert('Quiz saved and published successfully!');
+        console.log('Saved quiz data:', result);
+        // Optional: Reset form or redirect
+        // setQuizName('');
+        // setTimeEstimate('');
+        // setQuestions([]);
+      } else {
+        throw new Error(result.message || 'Failed to save quiz');
+      }
+    } catch (error) {
+      console.error('Error saving quiz:', error);
+      if (error instanceof Error) {
+        alert(`Error: ${error.message}`);
+      } else {
+        alert('An unknown error occurred');
+      }
     }
   };
 
