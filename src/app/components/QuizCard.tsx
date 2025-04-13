@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import edit from '../../assets/edit.png';
+
 import delet from '../../assets/delete.png';
 
 interface QuizCardProps {
@@ -26,16 +26,10 @@ export default function QuizCard({ title, questionCount }: QuizCardProps) {
         <div className="flex items-center justify-center space-x-4">
           {/* Edit button left of View Answers */}
           <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <Image 
-              src={edit} 
-              alt="Edit" 
-              width={20} 
-              height={20}
-              className="w-5 h-5"
-            />
+          <i className="fa-solid fa-pen text-[#005EFF] text-lg hover:text-yellow-600 transition-colors"></i>
+
           </button>
           
-          {/* View Answers button (center) */}
           <Link 
             href="#" 
             className="inline-block px-4 py-2 bg-[#E6E6E666] text-black rounded hover:bg-[#fce280] transition-colors"
@@ -45,13 +39,7 @@ export default function QuizCard({ title, questionCount }: QuizCardProps) {
           
           {/* Delete button right of View Answers */}
           <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <Image 
-              src={delet} 
-              alt="Delete" 
-              width={20} 
-              height={20}
-              className="w-5 h-5"
-            />
+          <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-yellow-600 transition-colors"></i>
           </button>
         </div>
       </div>

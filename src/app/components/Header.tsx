@@ -15,7 +15,7 @@ export default function Header() {
   }, []);
   
   return (
-    <header className="bg-white shadow-sm p-4">
+    <header className="bg-white shadow-sm p-2 border-b">
     <div className="flex justify-between items-center">
     <div></div>
       <div className="flex items-center space-x-4">
