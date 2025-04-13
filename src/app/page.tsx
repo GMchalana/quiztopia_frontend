@@ -1,4 +1,5 @@
 'use client';
+
 import { useRouter } from 'next/navigation';
 import login from '../assets/signup.png';
 import Image from 'next/image';
@@ -56,6 +57,7 @@ export default function LoginPage() {
       // Login successful - store token and redirect
       if (data.token) {
         localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userName', data.userName);
       }
       router.push('/instructor/dashboard'); // Redirect to dashboard or home page
     } catch (err) {
