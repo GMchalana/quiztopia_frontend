@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FiPlus, FiX, FiCheck } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
 type Question = {
   id: string;
@@ -19,6 +20,7 @@ export default function AutoGradedQuiz() {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [showQuestionTypeSelector, setShowQuestionTypeSelector] = useState(false);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const [isLoading, setIsLoading] = useState(false);
 
   const addQuestion = (type: 'multiple-choice' | 'true-false') => {
     const newQuestion: Question = {
@@ -70,34 +72,30 @@ export default function AutoGradedQuiz() {
     }
   };
 
-//   const saveQuiz = () => {
-//     if (quizName.trim() && questions.length > 0) {
-//       console.log({
-//         quizName,
-//         timeEstimate,
-//         questions,
-//       });
-//       alert('Quiz saved and published successfully!');
-//     } else {
-//       alert('Please add at least one question and provide a quiz name');
-//     }
-//   };
 
 
 
-const saveQuiz = async () => {
+
+  const saveQuiz = async () => {
     try {
       if (!quizName.trim() || questions.length === 0) {
-        alert('Please add at least one question and provide a quiz name');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Incomplete Information',
+          text: 'Please provide a quiz name and at least one question',
+          confirmButtonColor: '#F7CA21',
+        });
         return;
       }
-  
+
+      setIsLoading(true);
+      
       const quizData = {
         quizName,
         timeEstimate,
         questions
       };
-  
+
       const response = await fetch(`${baseUrl}/modules/quizzes`, {
         method: 'POST',
         headers: {
@@ -105,29 +103,40 @@ const saveQuiz = async () => {
         },
         body: JSON.stringify(quizData),
       });
-  
+
       const result = await response.json();
-  
-      if (response.ok) {
-        alert('Quiz saved and published successfully!');
-        console.log('Saved quiz data:', result);
-        // Optional: Reset form or redirect
-        // setQuizName('');
-        // setTimeEstimate('');
-        // setQuestions([]);
-      } else {
+
+      if (!response.ok) {
         throw new Error(result.message || 'Failed to save quiz');
       }
+
+      setIsLoading(false);
+      
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Quiz saved and published successfully!',
+        confirmButtonColor: '#F7CA21',
+      });
+
+      // Reset form
+      setQuizName('');
+      setTimeEstimate('');
+      setQuestions([]);
+      setCurrentQuestion(null);
+      
     } catch (error) {
+      setIsLoading(false);
       console.error('Error saving quiz:', error);
-      if (error instanceof Error) {
-        alert(`Error: ${error.message}`);
-      } else {
-        alert('An unknown error occurred');
-      }
+      
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error instanceof Error ? error.message : 'An unknown error occurred',
+        confirmButtonColor: '#F7CA21',
+      });
     }
   };
-
   const renderSavedQuestion = (question: Question, index: number) => {
     return (
       <div key={question.id} className="rounded-lg p-4 mb-4 border border-[#A4A4A4] bg-white">
@@ -400,12 +409,22 @@ const saveQuiz = async () => {
             Cancel
           </button>
           <button
-            onClick={saveQuiz}
-            className="px-6 py-2 bg-[#F7CA21] text-black rounded font-medium hover:bg-[#f8d34d] transition"
-            disabled={questions.length === 0 || !quizName.trim()}
-          >
-            Save & Publish
-          </button>
+          onClick={saveQuiz}
+          className="px-6 py-2 bg-[#F7CA21] text-black rounded font-medium hover:bg-[#f8d34d] transition flex items-center justify-center min-w-[150px]"
+          disabled={questions.length === 0 || !quizName.trim() || isLoading}
+        >
+          {isLoading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Saving...
+            </>
+          ) : (
+            'Save & Publish'
+          )}
+        </button>
         </div>
       </div>
     </div>

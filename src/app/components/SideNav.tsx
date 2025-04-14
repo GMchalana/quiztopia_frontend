@@ -56,7 +56,7 @@ export default function SideNav() {
       label: 'Dashboard' 
     },
     { 
-      href: '/instructor/quizes',
+      href: '/instructor/quizes/auto-graded-quize',
       icon: faQuestionCircle, 
       label: 'Quiz Builder',
       children: [

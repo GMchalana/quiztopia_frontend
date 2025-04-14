@@ -6,6 +6,8 @@ import Image from 'next/image';
 import logo from '../assets/logo.png';
 import { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi'; // Import eye icons from react-icons
+import Lottie from 'lottie-react'; // Import Lottie from lottie-react
+import loadingAnimation from '../../public/animations/loading.json';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -64,7 +66,7 @@ export default function LoginPage() {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Login error:', err);
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
@@ -73,6 +75,19 @@ export default function LoginPage() {
   };
 
   return (
+    <>
+
+    {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+            <Lottie 
+              animationData={loadingAnimation}
+              loop
+              className="w-40 h-40"
+            />
+          </div>
+        )}
+
+    
     <div className="h-screen flex flex-col bg-[#181820]">
       <div className="flex-1 flex flex-col md:flex-row relative">
         {/* Left side - Image (hidden on mobile) */}
@@ -138,14 +153,20 @@ export default function LoginPage() {
               </div>
 
               <div className="text-center w-full mt-8">
-                <button 
-                  className="w-full bg-[#F7CA21] py-3 px-4 rounded-sm text-black font-bold 
-                         hover:bg-[#fce280] transition-colors duration-300 ease-in-out"
-                  type="submit"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Logging in...' : 'Log in'}
-                </button>
+              <button 
+                className="w-full bg-[#F7CA21] py-3 px-4 rounded-sm text-black font-bold 
+                      hover:bg-[#fce280] transition-colors duration-300 ease-in-out flex justify-center items-center"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Lottie 
+                    animationData={loadingAnimation}
+                    loop
+                    style={{ height: 40 }} // or 24, 30 depending on look
+                  />
+                ) : 'Log in'}
+              </button>
               </div>
             </form>
 
@@ -162,5 +183,7 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+
+    </>
   );
 }

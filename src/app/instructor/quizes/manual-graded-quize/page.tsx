@@ -2,12 +2,15 @@
 
 import { useState } from 'react';
 import { FiPlus, FiX, FiCheck } from 'react-icons/fi';
+import Swal from 'sweetalert2';
 
 export default function ManualGradingModule() {
   const [moduleName, setModuleName] = useState('');
   const [timeEstimate, setTimeEstimate] = useState('');
   const [questions, setQuestions] = useState<{ id: number; question: string; sampleAnswer: string }[]>([]);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [currentQuestion, setCurrentQuestion] = useState({
     question: '',
     sampleAnswer: ''
@@ -19,7 +22,12 @@ export default function ManualGradingModule() {
 
   const saveQuestion = () => {
     if (!currentQuestion.question.trim() || !currentQuestion.sampleAnswer.trim()) {
-      alert('Please fill both question and sample answer');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Fields',
+        text: 'Please fill both question and sample answer',
+        confirmButtonColor: '#F7CA21',
+      });
       return;
     }
 
@@ -29,134 +37,156 @@ export default function ManualGradingModule() {
     }]);
     setCurrentQuestion({ question: '', sampleAnswer: '' });
     setShowQuestionForm(false);
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'Question Added',
+      text: 'Your question has been saved successfully',
+      showConfirmButton: false,
+      timer: 1500
+    });
   };
 
-  const removeQuestion = (id : any) => {
-    setQuestions(questions.filter(q => q.id !== id));
+  const removeQuestion = (id: any) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#F7CA21',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setQuestions(questions.filter(q => q.id !== id));
+        Swal.fire(
+          'Deleted!',
+          'Your question has been deleted.',
+          'success'
+        );
+      }
+    });
   };
 
   const saveModule = async () => {
     try {
       if (!moduleName.trim() || questions.length === 0) {
-        alert('Please provide a module name and at least one question');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Incomplete Information',
+          text: 'Please provide a module name and at least one question',
+          confirmButtonColor: '#F7CA21',
+        });
         return;
       }
-
-      const response = await fetch('http://localhost:3333/api/modules/manual', {
+  
+      setIsLoading(true);
+      
+      const requestBody = JSON.stringify({
+        moduleName,
+        timeEstimate,
+        questions
+      });
+  
+      const response = await fetch(`${baseUrl}/modules/store-manual-questions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          moduleName,
-          timeEstimate,
-          questions
-        }),
+        body: requestBody
       });
-
+  
       const result = await response.json();
-
-      if (response.ok) {
-        alert('Manual grading module created successfully!');
-        // Reset form
-        setModuleName('');
-        setTimeEstimate('');
-        setQuestions([]);
-      } else {
+  
+      if (!response.ok) {
         throw new Error(result.message || 'Failed to save module');
       }
+  
+      setIsLoading(false);
+      
+      await Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Manual grading module created successfully!',
+        confirmButtonColor: '#F7CA21',
+      });
+      
+      // Reset form
+      setModuleName('');
+      setTimeEstimate('');
+      setQuestions([]);
+      
     } catch (error) {
+      setIsLoading(false);
       console.error('Error saving module:', error);
-      if (error instanceof Error) {
-        alert(`Error: ${error.message}`);
-      } else {
-        alert('An unknown error occurred');
-      }
+      
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error instanceof Error ? error.message : 'An unknown error occurred',
+        confirmButtonColor: '#F7CA21',
+      });
     }
   };
 
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <div className="max-w-full mx-auto bg-white rounded-lg shadow p-6">
-        
-        
         {/* Basic Information */}
         <div className="mb-8">
-        <div className="rounded-lg p-6 mb-6 bg-white shadow">
-          <h2 className="text-xl font-semibold mb-4 text-[#000000]">Basic Information</h2>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="w-full">
-              <label className="block mb-2 font-medium text-[#000000]">Quiz Name *</label>
-              <input
-                type="text"
-                value={moduleName}
-                onChange={(e) => setModuleName(e.target.value)}
-                placeholder="Type Quiz Name here"
-                className="w-full p-3 bg-[#f5f5f5] rounded focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
-                required
-              />
-            </div>
+          <div className="rounded-lg p-6 mb-6 bg-white shadow">
+            <h2 className="text-xl font-semibold mb-4 text-[#000000]">Basic Information</h2>
             
-            <div className="w-full">
-              <label className="block mb-2 font-medium text-[#000000]">Estimation Time *</label>
-              <div className="flex">
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="w-full">
+                <label className="block mb-2 font-medium text-[#000000]">Quiz Name *</label>
                 <input
                   type="text"
-                  value={timeEstimate}
-                  onChange={(e) => setTimeEstimate(e.target.value)}
-                  placeholder="e.g. 40"
-                  className="w-full p-3 bg-[#f5f5f5] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
+                  value={moduleName}
+                  onChange={(e) => setModuleName(e.target.value)}
+                  placeholder="Type Quiz Name here"
+                  className="w-full p-3 bg-[#f5f5f5] rounded focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
+                  required
                 />
-                <div className="p-3 bg-[#f5f5f5] rounded-r-lg text-[#000000] border-l border-gray-300">
-                  Minutes
+              </div>
+              
+              <div className="w-full">
+                <label className="block mb-2 font-medium text-[#000000]">Estimation Time *</label>
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={timeEstimate}
+                    onChange={(e) => setTimeEstimate(e.target.value)}
+                    placeholder="e.g. 40"
+                    className="w-full p-3 bg-[#f5f5f5] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
+                  />
+                  <div className="p-3 bg-[#f5f5f5] rounded-r-lg text-[#000000] border-l border-gray-300">
+                    Minutes
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {!showQuestionForm && (
+          {!showQuestionForm && (
             <div className="flex justify-center mt-4">
-                <button
+              <button
                 onClick={addNewQuestion}
                 className="flex items-center px-4 py-2 bg-[#F7CA21] text-black rounded hover:bg-blue-700"
-                >
-                    <FiPlus className="mr-2" />
-                    Add New Question
-
-                </button>
+              >
+                <FiPlus className="mr-2" />
+                Add New Question
+              </button>
             </div>
-            )}
-
+          )}
         </div>
 
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-        {/* Question Form (shown when adding new question) */}
+        {/* Question Form */}
         {showQuestionForm && (
           <div className="mb-8 p-4 border border-gray-200 rounded-lg">
             <div className="mb-4">
-
-
-
-            <div className="flex justify-between items-center mb-4">
-            <label className="block mb-2 font-medium text-[#000000]">Question *</label>
+              <div className="flex justify-between items-center mb-4">
+                <label className="block mb-2 font-medium text-[#000000]">Question *</label>
                 <div className='flex items-center space-x-2'>
                   <button
                     onClick={saveQuestion}
@@ -174,12 +204,6 @@ export default function ManualGradingModule() {
                 </div>
               </div>
 
-
-
-
-
-
-              {/* <label className="block mb-2 font-medium text-[#000000]">Question *</label> */}
               <textarea
                 value={currentQuestion.question}
                 onChange={(e) => setCurrentQuestion({
@@ -207,21 +231,6 @@ export default function ManualGradingModule() {
                 required
               />
             </div>
-
-            {/* <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowQuestionForm(false)}
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveQuestion}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Save Question
-              </button>
-            </div> */}
           </div>
         )}
 
@@ -238,7 +247,7 @@ export default function ManualGradingModule() {
                     onClick={() => removeQuestion(q.id)}
                     className="text-red-500 hover:text-red-700"
                   >
-                   <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-[#CC0000] transition-colors"></i>
+                    <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-[#CC0000] transition-colors"></i>
                   </button>
                 </div>
                 
@@ -263,10 +272,20 @@ export default function ManualGradingModule() {
           </button>
           <button
             onClick={saveModule}
-            className="px-6 py-2 bg-[#F7CA21] text-[#000000] rounded hover:bg-green-700"
-            disabled={!moduleName.trim() || questions.length === 0}
+            className="px-6 py-2 bg-[#F7CA21] text-[#000000] rounded hover:bg-green-700 flex items-center justify-center min-w-[150px]"
+            disabled={!moduleName.trim() || questions.length === 0 || isLoading}
           >
-            Save & Publish
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </>
+            ) : (
+              'Save & Publish'
+            )}
           </button>
         </div>
       </div>
