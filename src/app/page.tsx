@@ -33,11 +33,22 @@ export default function LoginPage() {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = async (e : any) => {
+  const roleRoute = (role : string) => {
+    if(role === 'Student'){
+      router.push('/student/stDashboard');
+    }else if(role === 'Instructor'){
+      router.push('/instructor/dashboard');
+    }
+    
+  };
+
+  const handleLogin = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
+  
+    const startTime = Date.now();
+  
     try {
       const response = await fetch(`${baseUrl}/auth/login`, {
         method: 'POST',
@@ -49,26 +60,45 @@ export default function LoginPage() {
           password: formData.password
         })
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.error || 'Login failed');
       }
-
-      // Login successful - store token and redirect
+  
+      // Store token if login is successful
       if (data.token) {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userName', data.userName);
+        localStorage.setItem('userRole', data.role); 
       }
-      router.push('/instructor/dashboard'); // Redirect to dashboard or home page
+  
+      // Wait for at least 3 seconds total before redirecting
+      const elapsed = Date.now() - startTime;
+      const remaining = 3000 - elapsed;
+  
+      if (remaining > 0) {
+        setTimeout(() => {
+          roleRoute(data.role);
+        }, remaining);
+      } else {
+        roleRoute(data.role);
+      }
+  
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      const elapsed = Date.now() - startTime;
+      const remaining = 3000 - elapsed;
+  
+      setTimeout(() => {
+        setIsLoading(false);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      }, remaining > 0 ? remaining : 0);
+  
       console.error('Login error:', err);
-    } finally {
-      // setIsLoading(false);
     }
   };
+  
 
   const handleSignupRedirect = () => {
     router.push('/signup');

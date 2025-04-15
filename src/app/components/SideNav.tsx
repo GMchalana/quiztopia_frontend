@@ -22,7 +22,11 @@ type NavItem = {
   children?: NavItem[];
 };
 
-export default function SideNav() {
+type SideNavProps = {
+  role?: 'Student' | 'Instructor';
+};
+
+export default function SideNav({ role }: SideNavProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
@@ -49,7 +53,7 @@ export default function SideNav() {
     window.location.href = '/';
   };
 
-  const navItems: NavItem[] = [
+  const instructorNavItems: NavItem[] = [
     { 
       href: '/instructor/dashboard', 
       icon: faTachometerAlt, 
@@ -64,8 +68,24 @@ export default function SideNav() {
         { href: '/instructor/quizes/manual-graded-quize', icon: faLayerGroup, label: 'Manual Graded Quiz' }
       ]
     },
-    // Add more items as needed
   ];
+  
+  const studentNavItems: NavItem[] = [
+    { 
+      href: '/student/stDashboard', 
+      icon: faTachometerAlt, 
+      label: 'Dashboard' 
+    },
+    { 
+      href: '/student/quizzes',
+      icon: faBook, 
+      label: 'My Quizzes'
+    },
+    // Add more student-specific items as needed
+  ];
+  
+  // Get the appropriate nav items based on role
+  const navItems = role === 'Instructor' ? instructorNavItems : studentNavItems;
 
   const isActive = (href: string) => pathname === href || 
     (pathname?.startsWith(href) && href !== '/');
