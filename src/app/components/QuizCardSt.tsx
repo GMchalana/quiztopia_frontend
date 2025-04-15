@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface QuizCardProps {
     moduleId: number;
@@ -16,6 +18,7 @@ interface QuizCardProps {
     time,
     averageRating,
   }: QuizCardProps) {
+      const router = useRouter();
     const safeRating =
       averageRating !== null && averageRating !== undefined
         ? parseFloat(averageRating as string)
@@ -44,9 +47,17 @@ interface QuizCardProps {
   
       return stars;
     };
+
+
+
+    const handleStartQuiz = () => {
+        router.push(`/student/quizPage/${moduleId}`);
+      };
   
     return (
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex justify-between">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex justify-between"
+      onClick={handleStartQuiz}
+      >
         <div className="p-6 flex flex-col items-start justify-center text-left flex-grow">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             {title.split('\n').map((line, i) => (
