@@ -7,7 +7,9 @@ import Header from './components/Header';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/signup' || pathname === '/';
+
+  // Check for both static and dynamic routes under /student/quizPage
+  const isAuthPage = pathname === '/signup' || pathname === '/' || pathname.startsWith('/student/quizPage/');
 
   const [role, setRole] = useState<'Student' | 'Instructor' | undefined>();
 
@@ -18,11 +20,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   }, []);
 
+  // If on auth page (login/signup/quizPage), just render the children without SideNav/Header
   if (isAuthPage) {
     return <>{children}</>;
   }
 
-  // Optional: add a loading state while role is being set
+  // Optional: add a loading state while the role is being set
   if (!role) {
     return <div className="flex h-screen items-center justify-center text-gray-500">Loading...</div>;
   }

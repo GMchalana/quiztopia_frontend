@@ -3,17 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import logo from '../../assets/logo.png';
+import Image from 'next/image';
+
+interface Option {
+  id?: number;
+  answer: string;
+  trueOrFalse?: number;
+}
 
 interface Question {
   id: number;
   questionIndex: number;
   question: string;
   type: 'multiple-choice' | 'true-false';
-  options: {
-    id?: number;
-    answer: string;
-    trueOrFalse?: number;
-  }[];
+  options: Option[] | string[];
   correctAnswer?: number;
 }
 
@@ -37,7 +41,20 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
       try {
         const response = await fetch(`${baseUrl}/modules/questions/${moduleId}`);
         const data = await response.json();
-        setQuestions(data.questions);
+        // Normalize questions to ensure consistent structure
+        const normalizedQuestions = data.questions.map((question: Question) => {
+          if (question.type === 'true-false') {
+            return {
+              ...question,
+              options: question.options.map((option, index) => ({
+                answer: option,
+                trueOrFalse: index === 0 ? 1 : 0 // First option is True (1), second is False (0)
+              }))
+            };
+          }
+          return question;
+        });
+        setQuestions(normalizedQuestions);
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to fetch questions:', error);
@@ -139,23 +156,37 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
+  // Get options in consistent format
+  const options = currentQuestion.options.map((option, index) => {
+    if (typeof option === 'string') {
+      return {
+        answer: option,
+        trueOrFalse: index === 0 ? 1 : 0 // True is 1, False is 0
+      };
+    }
+    return option;
+  });
+
   return (
-    <div className="flex flex-col md:flex-row min-h-screen p-4 bg-gray-50">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[url('/quizbg.png')] bg-cover bg-no-repeat bg-center">
       {/* Main Question Area */}
-      <div className="w-full md:w-2/3 p-6 bg-white rounded-lg shadow-md">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Question {currentQuestionIndex + 1}</h2>
-          <p className="mt-2 text-gray-600">{currentQuestion.question}</p>
+      <div className="w-full md:w-3/4 p-6 rounded-lg shadow-md">
+        <div className="mb-6 flex items-center justify-center">
+          <h2 className="text-xl font-semibold text-[#F7CA21]">Question {currentQuestionIndex + 1}</h2>
         </div>
 
-        <div className="space-y-4">
-          {currentQuestion.options.map((option, index) => (
+        <div className="mb-6 flex items-center justify-center bg-[#292732E5]">
+          <p className="mt-2 text-[#FFFFFF] p-4">{currentQuestion.question}</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {options.map((option, index) => (
             <div
               key={option.id || index}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+              className={`p-4 cursor-pointer transition-colors bg-[#292732E5] ${
                 selectedAnswer === index
-                  ? 'bg-blue-100 border-blue-500'
-                  : 'hover:bg-gray-100 border-gray-300'
+                  ? 'bg-[#FF5C93CC] border-blue-500'
+                  : 'hover:bg-[#000000] border-gray-300'
               }`}
               onClick={() => handleAnswerSelect(index)}
             >
@@ -168,7 +199,7 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
           <div className="mt-8 flex justify-end">
             <button
               onClick={handleSubmitAndNext}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 text-black transition-colors bg-gradient-to-r from-[#FE9247] to-[#FFDF36] hover:opacity-90"
             >
               {isLastQuestion ? 'Submit & Finish' : 'Submit & Go Next'}
             </button>
@@ -177,10 +208,19 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
       </div>
 
       {/* Side Panel */}
-      <div className="w-full md:w-1/3 p-6 md:ml-4 mt-4 md:mt-0 bg-white rounded-lg shadow-md">
-        {/* Circular Timer */}
+      <div className="w-full md:w-1/4 p-6 md:ml-4 mt-4 md:mt-0 bg-[#181820] shadow-md flex flex-col items-center justify-between text-center min-h-[90vh] relative">
+        {/* Top Logo */}
+        <div>
+          <Image
+            src={logo}
+            alt="Logo" 
+            className="hidden md:block top-5 right-5 max-w-[150px] h-auto"
+          />
+        </div>
+
+        {/* Timer Section */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Time Remaining</h3>
+          <h3 className="text-lg font-semibold text-white mb-2">Time Remaining</h3>
           <div className="relative w-24 h-24 flex items-center justify-center mx-auto">
             <svg className="absolute w-full h-full" viewBox="0 0 100 100">
               {/* Background circle */}
@@ -189,7 +229,7 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
                 cy="50"
                 r="45"
                 fill="none"
-                stroke="#e5e7eb"
+                stroke="#374151"
                 strokeWidth="8"
               />
               {/* Animated progress circle */}
@@ -206,28 +246,24 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
                 transform="rotate(-90 50 50)"
               />
             </svg>
-            <span className="text-2xl font-bold text-blue-600 relative z-10">
+            <span className="text-2xl font-bold text-yellow-400 relative z-10">
               {formatTime(timeLeft)}
             </span>
           </div>
         </div>
 
+        {/* Progress Section */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-800">Progress</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-semibold text-white">Progress</h3>
+          <p className="text-gray-300">
             {currentQuestionIndex} of {questions.length} questions completed
           </p>
-          <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-            <div
-              className="bg-blue-600 h-2.5 rounded-full"
-              style={{ width: `${(currentQuestionIndex / questions.length) * 100}%` }}
-            ></div>
-          </div>
         </div>
 
+        {/* Finish Button */}
         <button
           onClick={handleFinish}
-          className="w-full px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          className="w-full px-6 py-2 bg-gradient-to-r from-[#FE9247] to-[#FFDF36] text-black rounded-lg hover:opacity-90 transition"
         >
           Finish
         </button>
