@@ -35,8 +35,13 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
   const [isLoading, setIsLoading] = useState(true);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
+
+    const userData = localStorage.getItem('userId');
+    setUserId(userData ? parseInt(userData, 10) || null : null);
+
     const fetchQuestions = async () => {
       try {
         const response = await fetch(`${baseUrl}/modules/questions/${moduleId}`);
@@ -105,14 +110,15 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
   const handleFinish = async () => {
     try {
       // Submit all answers to the server
-      const response = await fetch(`${baseUrl}/api/modules/submit-answers`, {
+      const response = await fetch(`${baseUrl}/answers/submit-answers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           moduleId,
-          answers
+          answers,
+          userId
         }),
       });
 

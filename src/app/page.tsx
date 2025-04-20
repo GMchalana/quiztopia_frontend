@@ -72,6 +72,7 @@ export default function LoginPage() {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userName', data.userName);
         localStorage.setItem('userRole', data.role); 
+        localStorage.setItem('userId', data.userId);
       }
   
       // Wait for at least 3 seconds total before redirecting
