@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
+import logo from '../../assets/logoH.png';
 import { 
   faTachometerAlt, 
   faQuestionCircle, 
@@ -141,10 +143,12 @@ export default function SideNav({ role }: SideNavProps) {
         <div className="p-4 flex items-center justify-between">
           {isOpen && (
             <div className="flex items-center">
-              <FontAwesomeIcon 
-                icon={faQuestionCircle} 
-                className="text-[#F7CA21] text-2xl" 
-              />
+              <Image
+                          src={logo}
+                          alt="Signup background"
+              objectFit="contain"
+              className="w-auto h-8"
+                        />
               <p className="text-xl font-bold text-[#F7CA21] font-Aclonica ml-2">QuizTopia</p>
             </div>
           )}
