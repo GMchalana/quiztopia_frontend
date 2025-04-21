@@ -6,10 +6,10 @@ import Swal from 'sweetalert2';
 
 type Question = {
   id: string;
-  type: 'multiple-choice' | 'true-false';
+  type: 'multiple-choice';
   question: string;
-  options?: string[];
-  correctAnswer?: any;
+  options: string[];
+  correctAnswer: any;
   timeEstimate?: string;
 };
 
@@ -22,12 +22,12 @@ export default function AutoGradedQuiz() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [isLoading, setIsLoading] = useState(false);
 
-  const addQuestion = (type: 'multiple-choice' | 'true-false') => {
+  const addQuestion = (isTrueFalse: boolean = false) => {
     const newQuestion: Question = {
       id: Date.now().toString(),
-      type,
+      type: 'multiple-choice',
       question: '',
-      options: type === 'multiple-choice' ? ['', ''] : ['True', 'False'],
+      options: isTrueFalse ? ['True', 'False'] : ['', ''],
       correctAnswer: undefined,
     };
     setCurrentQuestion(newQuestion);
@@ -42,28 +42,26 @@ export default function AutoGradedQuiz() {
     if (
       currentQuestion && 
       currentQuestion.question.trim() && 
-      (currentQuestion.type !== 'multiple-choice' || 
-        (currentQuestion.options && 
-         currentQuestion.options.every(opt => opt.trim()) && 
-         currentQuestion.correctAnswer !== undefined)
-    )) {
+      currentQuestion.options.every(opt => opt.trim()) && 
+      currentQuestion.correctAnswer !== undefined
+    ) {
       setQuestions([...questions, currentQuestion]);
       setCurrentQuestion(null);
     }
   };
 
   const addOption = () => {
-    if (currentQuestion) {
+    if (currentQuestion && !currentQuestion.options.includes('True')) {
       setCurrentQuestion({
         ...currentQuestion,
-        options: [...(currentQuestion.options || []), ''],
+        options: [...currentQuestion.options, ''],
       });
     }
   };
 
   const updateOption = (index: number, value: string) => {
-    if (currentQuestion) {
-      const newOptions = [...(currentQuestion.options || [])];
+    if (currentQuestion && !currentQuestion.options.includes('True')) {
+      const newOptions = [...currentQuestion.options];
       newOptions[index] = value;
       setCurrentQuestion({
         ...currentQuestion,
@@ -71,10 +69,6 @@ export default function AutoGradedQuiz() {
       });
     }
   };
-
-
-
-
 
   const saveQuiz = async () => {
     try {
@@ -137,12 +131,15 @@ export default function AutoGradedQuiz() {
       });
     }
   };
+
   const renderSavedQuestion = (question: Question, index: number) => {
+    const isTrueFalse = question.options.includes('True');
+    
     return (
       <div key={question.id} className="rounded-lg p-4 mb-4 border border-[#A4A4A4] bg-white">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-medium text-[#000000]">
-            {question.type === 'multiple-choice' ? 'Multiple Choice' : 'True/False'}
+            {isTrueFalse ? 'True/False' : 'Multiple Choice'}
           </h3>
         </div>
 
@@ -153,51 +150,29 @@ export default function AutoGradedQuiz() {
           </div>
         </div>
 
-        {question.type === 'multiple-choice' && question.options && (
-          <div>
-            <label className="block mb-2 text-[#000000]">Choices *</label>
-            {question.options.map((option, i) => (
-              <div key={i} className="flex items-center mb-2">
-                <input
-                  type="radio"
-                  name={`correctAnswer-${question.id}`}
-                  checked={question.correctAnswer === i}
-                  readOnly
-                  className="mr-3"
-                />
-                <div className="flex-1 p-2 bg-[#f5f5f5] rounded text-[#000000]">
-                  {option}
-                </div>
-                {question.correctAnswer === i && (
-                  <span className="ml-2 text-green-500">✓ Correct</span>
-                )}
+        <div>
+          <label className="block mb-2 text-[#000000]">
+            {isTrueFalse ? 'Answer *' : 'Choices *'} 
+            {!isTrueFalse && ' (Please select the correct answer)'}
+          </label>
+          {question.options.map((option, i) => (
+            <div key={i} className="flex items-center mb-2">
+              <input
+                type="radio"
+                name={`correctAnswer-${question.id}`}
+                checked={question.correctAnswer === i}
+                readOnly
+                className="mr-3"
+              />
+              <div className="flex-1 p-2 bg-[#f5f5f5] rounded text-[#000000]">
+                {option}
               </div>
-            ))}
-          </div>
-        )}
-
-        {question.type === 'true-false' && (
-          <div>
-            <label className="block mb-2 text-[#000000]">Answer *</label>
-            {question.options?.map((option, i) => (
-              <div key={i} className="flex items-center mb-2">
-                <input
-                  type="radio"
-                  name={`correctAnswer-${question.id}`}
-                  checked={question.correctAnswer === i}
-                  readOnly
-                  className="mr-3"
-                />
-                <div className="flex-1 p-2 bg-[#f5f5f5] rounded text-[#000000]">
-                  {option}
-                </div>
-                {question.correctAnswer === i && (
-                  <span className="ml-2 text-green-500">✓ Correct</span>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              {question.correctAnswer === i && (
+                <span className="ml-2 text-green-500">✓ Correct</span>
+              )}
+            </div>
+          ))}
+        </div>
 
         <div className="flex justify-end mt-4">
           <button
@@ -261,14 +236,14 @@ export default function AutoGradedQuiz() {
             
             <div className='flex flex-col md:flex-row justify-center gap-4'>
               <button
-                onClick={() => addQuestion('multiple-choice')}
+                onClick={() => addQuestion(false)}
                 className="flex items-center justify-center p-3 text-[#1E3050] bg-[#F7CA21] hover:bg-[#f8d34d] rounded transition"
               >
                 <FiPlus className="mr-2" />
                 Multiple Choice Question
               </button>
               <button
-                onClick={() => addQuestion('true-false')}
+                onClick={() => addQuestion(true)}
                 className="flex items-center justify-center p-3 text-[#1E3050] bg-[#F7CA21] hover:bg-[#f8d34d] rounded transition"
               >
                 <FiPlus className="mr-2" />
@@ -282,7 +257,7 @@ export default function AutoGradedQuiz() {
             <div className="rounded-lg p-4 mb-4 border border-[#A4A4A4] bg-[#f9f9f9]">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-medium text-[#000000]">
-                  {currentQuestion.type === 'multiple-choice' ? 'Multiple Choice' : 'True/False'}
+                  {currentQuestion.options.includes('True') ? 'True/False' : 'Multiple Choice'}
                 </h3>
                 <div className='flex items-center space-x-2'>
                   <button
@@ -316,49 +291,58 @@ export default function AutoGradedQuiz() {
                 />
               </div>
 
-              {currentQuestion.type === 'multiple-choice' && (
-                <div>
-                  <label className="block mb-2 text-[#000000]">Choices * (Please select the correct answer)</label>
-                  {currentQuestion.options?.map((option, index) => (
-                    <div key={index} className="flex items-center mb-2">
-                      <input
-                        type="radio"
-                        name="correctAnswer"
-                        checked={currentQuestion.correctAnswer === index}
-                        onChange={() => setCurrentQuestion({
-                          ...currentQuestion,
-                          correctAnswer: index,
-                        })}
-                        className="mr-3"
-                      />
-                      <input
-                        type="text"
-                        value={option}
-                        onChange={(e) => updateOption(index, e.target.value)}
-                        placeholder={`Choice ${index + 1}`}
-                        className="flex-1 p-2 bg-white rounded focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
-                        required
-                      />
-                      {currentQuestion.options && currentQuestion.options.length > 2 && (
-                        <button
-                          onClick={() => {
-                            const newOptions = [...currentQuestion.options || []];
-                            newOptions.splice(index, 1);
-                            setCurrentQuestion({
-                              ...currentQuestion,
-                              options: newOptions,
-                              correctAnswer: currentQuestion.correctAnswer === index ? undefined : 
-                                           currentQuestion.correctAnswer > index ? currentQuestion.correctAnswer - 1 : 
-                                           currentQuestion.correctAnswer,
-                            });
-                          }}
-                          className="ml-2 text-red-400 hover:text-red-300"
-                        >
-                          <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-[#CC0000] transition-colors"></i>
-                        </button>
-                      )}
-                    </div>
-                  ))}
+              <div>
+                <label className="block mb-2 text-[#000000]">
+                  {currentQuestion.options.includes('True') ? 'Answer *' : 'Choices *'} 
+                  (Please select the correct answer)
+                </label>
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index} className="flex items-center mb-2">
+                    <input
+                      type="radio"
+                      name="correctAnswer"
+                      checked={currentQuestion.correctAnswer === index}
+                      onChange={() => setCurrentQuestion({
+                        ...currentQuestion,
+                        correctAnswer: index,
+                      })}
+                      className="mr-3"
+                    />
+                    {currentQuestion.options.includes('True') ? (
+                      <span className='text-[#000000]'>{option}</span>
+                    ) : (
+                      <>
+                        <input
+                          type="text"
+                          value={option}
+                          onChange={(e) => updateOption(index, e.target.value)}
+                          placeholder={`Choice ${index + 1}`}
+                          className="flex-1 p-2 bg-white rounded focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
+                          required
+                        />
+                        {currentQuestion.options.length > 2 && (
+                          <button
+                            onClick={() => {
+                              const newOptions = [...currentQuestion.options];
+                              newOptions.splice(index, 1);
+                              setCurrentQuestion({
+                                ...currentQuestion,
+                                options: newOptions,
+                                correctAnswer: currentQuestion.correctAnswer === index ? undefined : 
+                                             currentQuestion.correctAnswer > index ? currentQuestion.correctAnswer - 1 : 
+                                             currentQuestion.correctAnswer,
+                              });
+                            }}
+                            className="ml-2 text-red-400 hover:text-red-300"
+                          >
+                            <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-[#CC0000] transition-colors"></i>
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                ))}
+                {!currentQuestion.options.includes('True') && (
                   <button
                     onClick={addOption}
                     className="flex items-center text-sm text-[#1E3050] hover:text-[#1E3050] mt-2 border border-[#1E3050] rounded px-3 py-1"
@@ -366,29 +350,8 @@ export default function AutoGradedQuiz() {
                     <FiPlus className="mr-1" />
                     Add Choice
                   </button>
-                </div>
-              )}
-
-              {currentQuestion.type === 'true-false' && (
-                <div>
-                  <label className="block mb-2 text-[#000000]">Answer * (Please select the correct answer)</label>
-                  {currentQuestion.options?.map((option, index) => (
-                    <div key={index} className="flex items-center mb-2">
-                      <input
-                        type="radio"
-                        name="correctAnswer"
-                        checked={currentQuestion.correctAnswer === index}
-                        onChange={() => setCurrentQuestion({
-                          ...currentQuestion,
-                          correctAnswer: index,
-                        })}
-                        className="mr-3"
-                      />
-                      <span className='text-[#000000]'>{option}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
 
@@ -409,22 +372,22 @@ export default function AutoGradedQuiz() {
             Cancel
           </button>
           <button
-          onClick={saveQuiz}
-          className="px-6 py-2 bg-[#F7CA21] text-black rounded font-medium hover:bg-[#f8d34d] transition flex items-center justify-center min-w-[150px]"
-          disabled={questions.length === 0 || !quizName.trim() || isLoading}
-        >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            </>
-          ) : (
-            'Save & Publish'
-          )}
-        </button>
+            onClick={saveQuiz}
+            className="px-6 py-2 bg-[#F7CA21] text-black rounded font-medium hover:bg-[#f8d34d] transition flex items-center justify-center min-w-[150px]"
+            disabled={questions.length === 0 || !quizName.trim() || isLoading}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </>
+            ) : (
+              'Save & Publish'
+            )}
+          </button>
         </div>
       </div>
     </div>

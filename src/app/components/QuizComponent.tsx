@@ -36,6 +36,8 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
   const [userId, setUserId] = useState<number | null>(null);
+  const [showRating, setShowRating] = useState(false);
+  const [rating, setRating] = useState(0);
 
   useEffect(() => {
 
@@ -141,16 +143,44 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
   
       if (!response.ok) throw new Error('Failed to submit answers');
   
-      Swal.fire({
+      // Show success message and then rating popup
+      await Swal.fire({
         title: 'Quiz Completed!',
         text: 'Your answers have been submitted successfully.',
         icon: 'success'
       });
   
-      onFinish();
+      // Show rating popup
+      setShowRating(true);
+      
     } catch (error) {
       console.error('Error submitting answers:', error);
       Swal.fire('Error', 'Failed to submit answers', 'error');
+    }
+  };
+
+  const handleRatingSubmit = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/modules/submit-rating`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moduleId,
+          userId,
+          numOfStars: rating
+        }),
+      });
+  
+      if (!response.ok) throw new Error('Failed to submit rating');
+  
+      Swal.fire('Thank You!', 'Your rating has been submitted.', 'success');
+      setShowRating(false);
+      onFinish();
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      Swal.fire('Error', 'Failed to submit rating', 'error');
     }
   };
   
@@ -292,6 +322,39 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
           Finish
         </button>
       </div>
+
+      {showRating && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-[#292732E5] p-8 rounded-lg max-w-md w-full">
+      <h2 className="text-xl font-semibold text-[#F7CA21] mb-4 text-center">How was it?</h2>
+      <p className="text-white mb-6 text-center">Please Rate the Quiz</p>
+      
+      <div className="flex justify-center mb-6">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => setRating(star)}
+            className="text-3xl mx-1 focus:outline-none"
+          >
+            {star <= rating ? '★' : '☆'}
+          </button>
+        ))}
+      </div>
+      
+      <button
+        onClick={handleRatingSubmit}
+        disabled={rating === 0}
+        className={`w-full px-6 py-2 bg-gradient-to-r from-[#FE9247] to-[#FFDF36] text-black rounded-lg hover:opacity-90 transition ${
+          rating === 0 ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
+      >
+        Submit
+      </button>
     </div>
+  </div>
+)}
+    </div>
+
+    
   );
 }

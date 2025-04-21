@@ -14,7 +14,7 @@ interface QuizAttempt {
   attemptId: number
 }
 
-export default function QuizAttemptsPage() {
+export default function QuizAttemptsPageManual() {
   const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

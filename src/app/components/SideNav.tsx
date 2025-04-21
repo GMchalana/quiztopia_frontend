@@ -12,7 +12,8 @@ import {
   faLayerGroup, 
   faBook, 
   faSignOutAlt,
-  faTrash // Added for your dashboard icon example
+  faTrash, // Added for your dashboard icon example
+  faFileImage
 } from '@fortawesome/free-solid-svg-icons';
 
 type NavItem = {
@@ -79,7 +80,11 @@ export default function SideNav({ role }: SideNavProps) {
     { 
       href: '/student/quizHistory',
       icon: faBook, 
-      label: 'My Quizzes'
+      label: 'My Quizzes',
+      children: [
+        { href: '/student/quizHistory', icon: faFileImage, label: 'Auto Graded Quiz' },
+        { href: '/student/quizHistoryManual', icon: faFileImage, label: 'Manual Graded Quiz' }
+      ]
     },
     // Add more student-specific items as needed
   ];

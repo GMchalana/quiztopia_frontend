@@ -4,10 +4,16 @@ import { useState } from 'react';
 import { FiPlus, FiX, FiCheck } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
+interface Question {
+  id: number;
+  question: string;
+  sampleAnswer: string;
+}
+
 export default function ManualGradingModule() {
   const [moduleName, setModuleName] = useState('');
   const [timeEstimate, setTimeEstimate] = useState('');
-  const [questions, setQuestions] = useState<{ id: number; question: string; sampleAnswer: string }[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -47,7 +53,7 @@ export default function ManualGradingModule() {
     });
   };
 
-  const removeQuestion = (id: any) => {
+  const removeQuestion = (id: number) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -82,18 +88,19 @@ export default function ManualGradingModule() {
   
       setIsLoading(true);
       
-      const requestBody = JSON.stringify({
-        moduleName,
-        timeEstimate,
-        questions
-      });
-  
       const response = await fetch(`${baseUrl}/modules/store-manual-questions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: requestBody
+        body: JSON.stringify({
+          moduleName,
+          timeEstimate,
+          questions: questions.map(q => ({
+            question: q.question,
+            sampleAnswer: q.sampleAnswer
+          }))
+        })
       });
   
       const result = await response.json();
@@ -151,19 +158,16 @@ export default function ManualGradingModule() {
               </div>
               
               <div className="w-full">
-                <label className="block mb-2 font-medium text-[#000000]">Estimation Time *</label>
-                <div className="flex">
-                  <input
-                    type="text"
-                    value={timeEstimate}
-                    onChange={(e) => setTimeEstimate(e.target.value)}
-                    placeholder="e.g. 40"
-                    className="w-full p-3 bg-[#f5f5f5] rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
-                  />
-                  <div className="p-3 bg-[#f5f5f5] rounded-r-lg text-[#000000] border-l border-gray-300">
-                    Minutes
-                  </div>
-                </div>
+                <label className="block mb-2 font-medium text-[#000000]">Estimation Time (minutes) *</label>
+                <input
+                  type="number"
+                  value={timeEstimate}
+                  onChange={(e) => setTimeEstimate(e.target.value)}
+                  placeholder="e.g. 40"
+                  className="w-full p-3 bg-[#f5f5f5] rounded focus:outline-none focus:ring-2 focus:ring-[#F7CA21] placeholder-[#969696] text-[#000000]"
+                  min="1"
+                  required
+                />
               </div>
             </div>
           </div>
@@ -172,7 +176,7 @@ export default function ManualGradingModule() {
             <div className="flex justify-center mt-4">
               <button
                 onClick={addNewQuestion}
-                className="flex items-center px-4 py-2 bg-[#F7CA21] text-black rounded hover:bg-blue-700"
+                className="flex items-center px-4 py-2 bg-[#F7CA21] text-black rounded hover:bg-[#f8d34d] transition"
               >
                 <FiPlus className="mr-2" />
                 Add New Question
@@ -199,7 +203,7 @@ export default function ManualGradingModule() {
                     onClick={() => setShowQuestionForm(false)}
                     className="flex items-center bg-[#FFDFDF66] text-black py-1 px-3 rounded text-sm hover:bg-[#FFDFDF99] transition"
                   >
-                    <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-[#CC0000] transition-colors"></i>
+                    <FiX className="text-[#FF0000] hover:text-[#CC0000] transition-colors" />
                   </button>
                 </div>
               </div>
@@ -247,7 +251,7 @@ export default function ManualGradingModule() {
                     onClick={() => removeQuestion(q.id)}
                     className="text-red-500 hover:text-red-700"
                   >
-                    <i className="fa-solid fa-trash text-[#FF0000] text-lg hover:text-[#CC0000] transition-colors"></i>
+                    <FiX className="text-[#FF0000] hover:text-[#CC0000] transition-colors" />
                   </button>
                 </div>
                 
@@ -267,12 +271,19 @@ export default function ManualGradingModule() {
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-4">
-          <button className="px-6 py-2 border border-gray-300 text-[#4C4C4C] rounded bg-[#CACACA] hover:bg-gray-100">
+          <button 
+            onClick={() => {
+              setModuleName('');
+              setTimeEstimate('');
+              setQuestions([]);
+            }}
+            className="px-6 py-2 border border-gray-300 text-[#4C4C4C] rounded bg-[#CACACA] hover:bg-gray-100"
+          >
             Cancel
           </button>
           <button
             onClick={saveModule}
-            className="px-6 py-2 bg-[#F7CA21] text-[#000000] rounded hover:bg-green-700 flex items-center justify-center min-w-[150px]"
+            className="px-6 py-2 bg-[#F7CA21] text-[#000000] rounded hover:bg-[#f8d34d] transition flex items-center justify-center min-w-[150px]"
             disabled={!moduleName.trim() || questions.length === 0 || isLoading}
           >
             {isLoading ? (
