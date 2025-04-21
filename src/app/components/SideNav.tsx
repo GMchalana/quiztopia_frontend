@@ -77,7 +77,7 @@ export default function SideNav({ role }: SideNavProps) {
       label: 'Dashboard' 
     },
     { 
-      href: '/student/quizzes',
+      href: '/student/quizHistory',
       icon: faBook, 
       label: 'My Quizzes'
     },

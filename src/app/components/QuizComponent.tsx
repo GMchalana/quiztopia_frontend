@@ -90,15 +90,17 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
 
   const handleSubmitAndNext = () => {
     if (selectedAnswer === null) return;
-
-    // Save the answer
+  
     const currentQuestion = questions[currentQuestionIndex];
+    const selectedOption = currentQuestion.options[selectedAnswer] as Option;
+  
+    if (!selectedOption?.id) return;
+  
     setAnswers(prev => ({
       ...prev,
-      [currentQuestion.id]: selectedAnswer
+      [currentQuestion.id]: selectedOption.id!
     }));
-
-    // Move to next question or finish if last question
+  
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
@@ -106,9 +108,24 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
       handleFinish();
     }
   };
+  
 
   const handleFinish = async () => {
     try {
+      const currentQuestion = questions[currentQuestionIndex];
+  
+      // Ensure the last selected answer is saved
+      const finalAnswers = { ...answers };
+      if (
+        selectedAnswer !== null &&
+        !Object.prototype.hasOwnProperty.call(finalAnswers, currentQuestion.id)
+      ) {
+        const selectedOption = currentQuestion.options[selectedAnswer] as Option;
+        if (selectedOption?.id) {
+          finalAnswers[currentQuestion.id] = selectedOption.id;
+        }
+      }
+  
       // Submit all answers to the server
       const response = await fetch(`${baseUrl}/answers/submit-answers`, {
         method: 'POST',
@@ -117,25 +134,26 @@ export default function QuizComponent({ moduleId, onFinish }: QuizProps) {
         },
         body: JSON.stringify({
           moduleId,
-          answers,
+          answers: finalAnswers,
           userId
         }),
       });
-
+  
       if (!response.ok) throw new Error('Failed to submit answers');
-
+  
       Swal.fire({
         title: 'Quiz Completed!',
         text: 'Your answers have been submitted successfully.',
         icon: 'success'
       });
-
+  
       onFinish();
     } catch (error) {
       console.error('Error submitting answers:', error);
       Swal.fire('Error', 'Failed to submit answers', 'error');
     }
   };
+  
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
