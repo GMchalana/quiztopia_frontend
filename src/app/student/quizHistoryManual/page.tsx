@@ -30,7 +30,7 @@ export default function QuizAttemptsPageManual() {
     
         if (uid && baseUrl) {
           setUserId(uid);
-          const res = await fetch(`${baseUrl}/answers/quiz-attempts/${uid}`);
+          const res = await fetch(`${baseUrl}/answers/quiz-attempts-manual/${uid}`);
           const data = await res.json();
           setAttempts(data || []);
         }
@@ -47,7 +47,7 @@ export default function QuizAttemptsPageManual() {
 
 
   const handleAttemptClick = (moduleId: number, attemptId: number) => {
-    router.push(`/student/quizReview/${userId}/${moduleId}/${attemptId}`);
+    router.push(`/student/quizReviewManual/${userId}/${moduleId}/${attemptId}`);
   };
 
   if (isLoading) {

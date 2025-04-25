@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 interface QuizCardProps {
     moduleId: number;
     title: string;
+    type: string;
     questionCount: number;
     time: number;
     averageRating?: number | string | null; // Accept string too
@@ -14,6 +15,7 @@ interface QuizCardProps {
   export default function QuizCardSt({
     moduleId,
     title,
+    type,
     questionCount,
     time,
     averageRating,
@@ -51,7 +53,7 @@ interface QuizCardProps {
 
 
     const handleStartQuiz = () => {
-        router.push(`/student/quizPage/${moduleId}`);
+        router.push(`/student/quizPage/${moduleId}/${type}`);
       };
   
     return (

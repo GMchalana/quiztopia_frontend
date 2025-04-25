@@ -8,6 +8,7 @@ interface Module {
   id: number;
   moduleName: string;
   numOfQuestions: number;
+  manualOrAuto: string; // Assuming this is part of the module data
   estimationTime: number;
   averageRating: number; // Assuming this is part of the module data
 }
@@ -98,6 +99,7 @@ export default function StDashboard() {
               key={module.id}
               moduleId={module.id}
               title={module.moduleName}
+              type={module.manualOrAuto}
               questionCount={module.numOfQuestions}
               time={module.estimationTime}
               averageRating={module.averageRating} // Placeholder for average rating

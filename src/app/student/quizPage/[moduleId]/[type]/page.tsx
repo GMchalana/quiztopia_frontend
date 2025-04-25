@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import QuizComponent from '../../../components/QuizComponent';
+import QuizComponent from '../../../../components/QuizComponent';
 
-export default function QuizPage({ params }: { params: { moduleId: string } }) {
+export default function QuizPage({ params }: { params: { moduleId: string, type: string } }) {
   const router = useRouter();
 
   const handleFinish = () => {
@@ -12,7 +12,7 @@ export default function QuizPage({ params }: { params: { moduleId: string } }) {
 
   return (
     <div className="min-h-screen bg-[url('/src/assets/quizbg.jpg')]">
-      <QuizComponent moduleId={params.moduleId} onFinish={handleFinish} />
+      <QuizComponent moduleId={params.moduleId} type={params.type} onFinish={handleFinish} />
     </div>
   );
 }
