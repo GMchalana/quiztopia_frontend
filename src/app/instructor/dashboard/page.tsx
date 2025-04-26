@@ -7,6 +7,7 @@ import QuizCard from '../../components/QuizCard';
 interface Module {
   id: number;
   moduleName: string;
+  manualOrAuto: string;
   numOfQuestions: number;
   estimationTime: number;
 }
@@ -58,6 +59,7 @@ export default function DashboardPage() {
           <QuizCard 
             key={module.id}
             moduleId={module.id}
+            type={module.manualOrAuto}
             title={module.moduleName}
             questionCount={module.numOfQuestions}
             onDelete={handleDelete}

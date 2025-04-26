@@ -3,12 +3,27 @@ import Image from 'next/image';
 
 interface QuizCardProps {
   moduleId: number;
+  type: string;
   title: string;
   questionCount: number;
   onDelete: (moduleId: number) => void;
 }
 
-export default function QuizCard({ moduleId, title, questionCount, onDelete }: QuizCardProps) {
+export default function QuizCard({ moduleId,type, title, questionCount, onDelete }: QuizCardProps) {
+
+
+  const getHref = () => {
+    if (type === 'auto') {
+      return `/instructor/reviewAutoQuiz/${moduleId}/stAttempts`;
+    } else if (type === 'manual') {
+      return `/instructor/reviewManualQuiz/${moduleId}/stAttemptAuto`;
+    }
+    // Default fallback (you can adjust this as needed)
+    return `/modules/${moduleId}/attempts`;
+  };
+
+
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
       <div className="p-6 flex flex-col items-center justify-center text-center flex-grow">
@@ -28,7 +43,7 @@ export default function QuizCard({ moduleId, title, questionCount, onDelete }: Q
           </button>
 
           <Link
-            href="#"
+             href={getHref()}
             className="inline-block px-4 py-2 bg-[#E6E6E666] text-black rounded hover:bg-[#fce280] transition-colors"
           >
             View Answers
