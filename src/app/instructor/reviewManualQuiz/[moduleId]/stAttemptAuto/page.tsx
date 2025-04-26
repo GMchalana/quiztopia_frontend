@@ -111,7 +111,7 @@ export default function ModuleAttemptsPage() {
                 <div className="flex items-center gap-4">
                   <div className="text-right">
                     <p className="font-medium">
-                      {attempt.gradingStatus === 'graded' ? 
+                      {attempt.gradingStatus === 'Fully graded' ? 
                         `${attempt.score}/${attempt.totalQuestions} were correct` : 
                         'Not Reviewed yet'}
                     </p>
@@ -122,12 +122,12 @@ export default function ModuleAttemptsPage() {
                   <Link
                     href={`/instructor/manualQuizDetails/${attempt.attemptId}/manualAnswers`}
                     className={`px-4 py-2 rounded-md text-sm font-medium ${
-                      attempt.gradingStatus === 'graded' 
+                      attempt.gradingStatus === 'Fully graded' 
                         ? 'bg-gray-200 text-gray-800 hover:bg-gray-300' 
                         : 'bg-blue-600 text-white hover:bg-blue-700'
                     } transition-colors`}
                   >
-                    {attempt.gradingStatus === 'graded' ? 'Review' : 'Review'}
+                    {attempt.gradingStatus === 'Fully graded' ? 'Review' : 'Review'}
                   </Link>
                 </div>
               </div>
