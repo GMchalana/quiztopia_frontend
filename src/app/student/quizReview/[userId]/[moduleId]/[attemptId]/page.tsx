@@ -15,10 +15,10 @@ interface Question {
     answerText: string;
     isCorrect: boolean;
   }[];
-  userResponse: {
+  userResponse?: {
     studentAnswerId: number;
     selectedAnswerIndex: number;
-    selectedAnswerText: string;
+    selectedAnswerText: any;
     submittedAt: string;
   };
   isCorrect: boolean;
@@ -157,7 +157,7 @@ export default function QuizReviewPage({
                       : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {question.userResponse.selectedAnswerText}
+                  {question.userResponse?.selectedAnswerText}
                 </p>
               </div>
 

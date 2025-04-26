@@ -110,7 +110,7 @@ export default function ModuleAttemptsPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="font-medium">
+                    <p className="font-medium text-black">
                       {attempt.gradingStatus === 'Fully graded' ? 
                         `${attempt.score}/${attempt.totalQuestions} were correct` : 
                         'Not Reviewed yet'}

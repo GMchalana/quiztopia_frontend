@@ -160,7 +160,7 @@ export default function ReviewAttemptPage() {
         <div className="mt-2 text-sm text-gray-500">
           Attempt #{attemptDetails.attemptNumber} • {new Date(attemptDetails.attemptDate).toLocaleString()}
         </div>
-        <div className="mt-2 text-sm font-medium">
+        <div className="mt-2 text-sm font-medium text-gray-800">
           Grading Status: <span className="text-blue-600">{attemptDetails.scoreSummary.gradingStatus}</span>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function ReviewAttemptPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h3 className="font-medium text-gray-700">Student's Answer:</h3>
-                <div className="bg-gray-50 p-4 rounded border border-gray-200">
+                <div className="bg-gray-50 p-4 rounded border border-gray-200 text-gray-800">
                   {question.studentAnswer}
                 </div>
                 <div className="flex space-x-4">
@@ -206,7 +206,7 @@ export default function ReviewAttemptPage() {
 
               <div className="space-y-4">
                 <h3 className="font-medium text-gray-700">Expected Answer:</h3>
-                <div className="bg-gray-50 p-4 rounded border border-gray-200">
+                <div className="bg-gray-50 p-4 rounded border border-gray-200 text-gray-800">
                   {question.sampleAnswer}
                 </div>
               </div>

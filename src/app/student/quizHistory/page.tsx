@@ -54,7 +54,7 @@ export default function QuizAttemptsPage() {
     return (
       <div className="max-w-2xl mx-auto p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">All (00)</h2>
+          <h2 className="text-lg font-semibold text-gray-800">All (00)</h2>
           <div className="bg-white border rounded px-3 py-1 text-sm">Auto-Graded Answers</div>
         </div>
         <div className="space-y-3">
@@ -69,8 +69,8 @@ export default function QuizAttemptsPage() {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">All ({(attempts?.length || 0).toString().padStart(2, '0')})</h2>
-        <div className="bg-white border rounded px-3 py-1 text-sm">Auto-Graded Answers</div>
+        <h2 className="text-lg font-semibold text-gray-800">All ({(attempts?.length || 0).toString().padStart(2, '0')})</h2>
+        <div className="bg-white border rounded px-3 py-1 text-sm text-gray-800">Auto-Graded Answers</div>
       </div>
 
       <div className="space-y-3">
@@ -82,7 +82,7 @@ export default function QuizAttemptsPage() {
               onClick={() => handleAttemptClick(item.moduleId, item.attemptId)}
             >
               <div>
-                <div className="font-medium">{item.moduleName}</div>
+                <div className="font-medium text-gray-800">{item.moduleName}</div>
                 <div className="text-sm text-gray-500">
                   <span className="text-yellow-600 font-semibold">
                     {item.correct.toString().padStart(2, '0')}/{item.total.toString().padStart(2, '0')}

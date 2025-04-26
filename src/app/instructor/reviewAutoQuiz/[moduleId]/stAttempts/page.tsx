@@ -55,7 +55,7 @@ export default async function ModuleAttemptsPage({
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">
+                    <p className="font-medium text-gray-800">
                       {attempt.score}/{attempt.totalQuestions} were correct
                     </p>
                     <p className="text-sm text-gray-500">
