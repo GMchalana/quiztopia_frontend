@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
 interface Question {
   questionId: number;
@@ -122,7 +123,14 @@ export default function ReviewAttemptPage() {
       
       setChangesMade(false);
       router.refresh();
-      alert('Grading saved successfully!');
+     
+        Swal.fire({
+             icon: 'success',
+             title: 'Reviewed!',
+             text: 'Grading saved successfully!',
+             showConfirmButton: false,
+             timer: 1500
+           });
     } catch (err) {
       console.error("Error details:", err); // Also log the error details
       setError((err as Error).message);
