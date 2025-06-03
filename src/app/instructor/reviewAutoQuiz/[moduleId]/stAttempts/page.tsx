@@ -12,15 +12,21 @@ interface Attempt {
   percentage: number;
 }
 
-async function getModuleAttempts(moduleId: string) {
-   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+interface ModuleAttemptsResponse {
+  moduleName: string;
+  attempts: Attempt[];
+}
+
+async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/review/get-all-attemps-for-ins/${moduleId}`, {
-    next: { revalidate: 3600 } // Optional: revalidate data every hour
+    next: { revalidate: 3600 }
   });
-  
+
   if (!res.ok) {
     throw new Error('Failed to fetch attempts');
   }
+
   return res.json();
 }
 
