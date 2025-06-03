@@ -17,12 +17,6 @@ interface ModuleAttemptsResponse {
   attempts: Attempt[];
 }
 
-interface PageProps {
-  params: {
-    moduleId: string;
-  };
-}
-
 async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsResponse> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/review/get-all-attemps-for-ins/${moduleId}`, {
@@ -36,7 +30,11 @@ async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsRespon
   return res.json();
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({
+  params,
+}: {
+  params: { moduleId: string };
+}) {
   try {
     const { moduleName, attempts } = await getModuleAttempts(params.moduleId);
 
