@@ -33,10 +33,12 @@ async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsRespon
 export default async function Page({
   params,
 }: {
-  params: { moduleId: string };
+  params: Promise<{ moduleId: string }>;
 }) {
   try {
-    const { moduleName, attempts } = await getModuleAttempts(params.moduleId);
+    // Await the params since they are now async
+    const { moduleId } = await params;
+    const { moduleName, attempts } = await getModuleAttempts(moduleId);
 
     return (
       <div className="container mx-auto px-4 py-8">
