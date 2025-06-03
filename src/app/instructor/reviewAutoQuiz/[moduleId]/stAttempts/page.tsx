@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import type { Metadata } from 'next';
 
 interface Attempt {
   attemptId: number;
@@ -30,7 +31,17 @@ async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsRespon
   return res.json();
 }
 
-export default async function Page({
+export async function generateMetadata({
+  params,
+}: {
+  params: { moduleId: string };
+}): Promise<Metadata> {
+  return {
+    title: `Quiz Attempts - Module ${params.moduleId}`,
+  };
+}
+
+export default async function ModuleAttemptsPage({
   params,
 }: {
   params: { moduleId: string };
