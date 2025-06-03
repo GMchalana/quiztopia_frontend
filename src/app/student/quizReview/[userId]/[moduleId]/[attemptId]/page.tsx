@@ -18,11 +18,12 @@ interface Question {
   userResponse?: {
     studentAnswerId: number;
     selectedAnswerIndex: number;
-    selectedAnswerText: any;
+    selectedAnswerText: string;
     submittedAt: string;
   };
   isCorrect: boolean;
 }
+
 
 interface ReviewData {
   moduleId: string;

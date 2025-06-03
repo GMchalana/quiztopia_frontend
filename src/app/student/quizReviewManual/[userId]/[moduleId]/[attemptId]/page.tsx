@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { use } from 'react';
-import { format } from 'date-fns';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
@@ -34,7 +33,7 @@ export default function QuizReviewPage({
 }: {
   params: Promise<{ userId: string; moduleId: string; attemptId: string }>;
 }) {
-  const { userId, moduleId, attemptId } = use(params);
+  const { attemptId } = use(params);
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);

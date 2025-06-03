@@ -9,7 +9,7 @@ type Question = {
   type: 'multiple-choice';
   question: string;
   options: string[];
-  correctAnswer: any;
+  correctAnswer: number | undefined;
   timeEstimate?: string;
 };
 
@@ -18,7 +18,7 @@ export default function AutoGradedQuiz() {
   const [timeEstimate, setTimeEstimate] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-  const [showQuestionTypeSelector, setShowQuestionTypeSelector] = useState(false);
+ 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,7 +31,7 @@ export default function AutoGradedQuiz() {
       correctAnswer: undefined,
     };
     setCurrentQuestion(newQuestion);
-    setShowQuestionTypeSelector(false);
+
   };
 
   const cancelCurrentQuestion = () => {
@@ -328,9 +328,11 @@ export default function AutoGradedQuiz() {
                               setCurrentQuestion({
                                 ...currentQuestion,
                                 options: newOptions,
-                                correctAnswer: currentQuestion.correctAnswer === index ? undefined : 
-                                             currentQuestion.correctAnswer > index ? currentQuestion.correctAnswer - 1 : 
-                                             currentQuestion.correctAnswer,
+                                correctAnswer: currentQuestion.correctAnswer === index
+                                  ? undefined
+                                  : (typeof currentQuestion.correctAnswer === 'number' && currentQuestion.correctAnswer > index)
+                                    ? currentQuestion.correctAnswer - 1
+                                    : currentQuestion.correctAnswer,
                               });
                             }}
                             className="ml-2 text-red-400 hover:text-red-300"

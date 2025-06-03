@@ -3,24 +3,24 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import signup from '../../assets/login.webp';
 import logo from '../../assets/logo.png';
-import { useState } from 'react';
-import { FiEye, FiEyeOff } from 'react-icons/fi'; // Import eye icons from react-icons
+import { useState, ChangeEvent, FormEvent } from 'react';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 export default function SignupPage() {
   const router = useRouter();
-  const [userType, setUserType] = useState('Student');
+  const [userType, setUserType] = useState<'Instructor' | 'Student'>('Student');
   const [formData, setFormData] = useState({
     userName: '',
     email: '',
     password: '',
-    role: 'Student' // Default role
+    role: 'Student'
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
-   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const [showPassword, setShowPassword] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const handleInputChange = (e : any) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -28,12 +28,11 @@ export default function SignupPage() {
     }));
   };
 
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleUserTypeChange = (type : any) => {
+  const handleUserTypeChange = (type: 'Instructor' | 'Student') => {
     setUserType(type);
     setFormData(prev => ({
       ...prev,
@@ -41,7 +40,7 @@ export default function SignupPage() {
     }));
   };
 
-  const handleSignup = async (e : any) => {
+  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -61,8 +60,7 @@ export default function SignupPage() {
         throw new Error(data.error || 'Signup failed');
       }
 
-      // Signup successful
-      router.push('/'); // Redirect to login page
+      router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Signup error:', err);
@@ -74,12 +72,12 @@ export default function SignupPage() {
   return (
     <div className="h-screen flex flex-col bg-[#181820]">
       <div className="flex-1 flex flex-col md:flex-row relative">
-        {/* Left side - Image (hidden on mobile) */}
+        {/* Left side - Image */}
         <div className="hidden md:block md:w-1/2 relative">
           <Image
             src={signup}
             alt="Signup background"
-            layout="fill"
+            fill
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
@@ -94,7 +92,9 @@ export default function SignupPage() {
             />
             
             <h1 className="text-4xl font-semibold font-Inter mb-8 text-center">Join the Quiz Revolution!</h1>
-            <p className="text-md font-Inter mb-8 text-center text-[#888990]">Whether you're here to learn or to teach, your journey starts now!</p>
+            <p className="text-md font-Inter mb-8 text-center text-[#888990]">
+              Whether you&rsquo;re here to learn or to teach, your journey starts now!
+            </p>
             
             {error && (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-sm text-center">
@@ -111,7 +111,7 @@ export default function SignupPage() {
                     className={`px-4 py-2 w-full rounded-md font-medium ${userType === type 
                       ? 'bg-[#181820] text-[#F7CA21] border border-[#F7CA21]' 
                       : 'bg-[#181820] text-[#78797D] border border-[#78797D] hover:bg-[#292732]'}`}
-                    onClick={() => handleUserTypeChange(type)}
+                    onClick={() => handleUserTypeChange(type as 'Instructor' | 'Student')}
                   >
                     {type}
                   </button>
@@ -142,19 +142,6 @@ export default function SignupPage() {
                 />
               </div>
 
-              {/* <div className="mb-8">
-                <input 
-                  type="password" 
-                  id="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  placeholder="Your Password" 
-                  className="w-full p-3 bg-[#292732] focus:outline-none focus:border-gray-600 transition-colors rounded-sm"
-                  required
-                  minLength={6}
-                />
-              </div> */}
-
               <div className="mb-8 relative">
                 <input 
                   type={showPassword ? "text" : "password"}
@@ -175,8 +162,6 @@ export default function SignupPage() {
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </button>
               </div>
-
-
 
               <div className="text-center w-full mt-8">
                 <button 

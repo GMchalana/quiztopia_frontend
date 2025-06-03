@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import logo from '../../assets/logo.png';
 import Image from 'next/image';
+import { useCallback } from 'react';
 
 interface Option {
   id?: number;
@@ -37,7 +37,6 @@ export default function QuizComponent({ moduleId, type, onFinish }: QuizProps) {
   const [timeLeft, setTimeLeft] = useState(11 * 60 + 2); // 11:02 in seconds
   const [isLoading, setIsLoading] = useState(true);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const router = useRouter();
   const [userId, setUserId] = useState<number | null>(null);
   const [showRating, setShowRating] = useState(false);
   const [rating, setRating] = useState(0);
@@ -77,61 +76,11 @@ export default function QuizComponent({ moduleId, type, onFinish }: QuizProps) {
     };
 
     fetchQuestions();
-  }, [moduleId, baseUrl, onFinish]);
+  }, [moduleId, baseUrl, type, onFinish]);
 
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      handleFinish();
-      return;
-    }
 
-    const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
-    }, 1000);
 
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
-  const handleAnswerSelect = (optionIndex: number) => {
-    setSelectedAnswer(optionIndex);
-  };
-
-  const handleManualAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setManualAnswer(e.target.value);
-  };
-
-  const handleSubmitAndNext = () => {
-    const currentQuestion = questions[currentQuestionIndex];
-    
-    if (currentQuestion.type === 'manual-graded') {
-      if (!manualAnswer.trim()) return;
-      
-      setAnswers(prev => ({
-        ...prev,
-        [currentQuestion.id]: manualAnswer
-      }));
-    } else {
-      if (selectedAnswer === null) return;
-      
-      const selectedOption = currentQuestion.options?.[selectedAnswer] as Option;
-      if (!selectedOption?.id) return;
-      
-      setAnswers(prev => ({
-        ...prev,
-        [currentQuestion.id]: selectedOption.id!
-      }));
-    }
-    
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      setManualAnswer('');
-    } else {
-      handleFinish();
-    }
-  };
-
-  const handleFinish = async () => {
+  const handleFinish = useCallback(async () => {
     try {
       const currentQuestion = questions[currentQuestionIndex];
   
@@ -199,8 +148,63 @@ export default function QuizComponent({ moduleId, type, onFinish }: QuizProps) {
       console.error('Error submitting answers:', error);
       Swal.fire('Error', 'Failed to submit answers', 'error');
     }
+  }, [answers, currentQuestionIndex, manualAnswer, moduleId, questions, selectedAnswer, type, userId, baseUrl, onFinish]);
+
+
+useEffect(() => {
+  if (timeLeft <= 0) {
+    handleFinish();
+    return;
+  }
+
+  const timer = setInterval(() => {
+    setTimeLeft(prev => prev - 1);
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [timeLeft, handleFinish]);
+
+
+  const handleAnswerSelect = (optionIndex: number) => {
+    setSelectedAnswer(optionIndex);
   };
 
+  const handleManualAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setManualAnswer(e.target.value);
+  };
+
+  const handleSubmitAndNext = () => {
+    const currentQuestion = questions[currentQuestionIndex];
+    
+    if (currentQuestion.type === 'manual-graded') {
+      if (!manualAnswer.trim()) return;
+      
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: manualAnswer
+      }));
+    } else {
+      if (selectedAnswer === null) return;
+      
+      const selectedOption = currentQuestion.options?.[selectedAnswer] as Option;
+      if (!selectedOption?.id) return;
+      
+      setAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: selectedOption.id!
+      }));
+    }
+    
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedAnswer(null);
+      setManualAnswer('');
+    } else {
+      handleFinish();
+    }
+  };
+
+  
   const handleRatingSubmit = async () => {
     try {
       const response = await fetch(`${baseUrl}/modules/submit-rating`, {

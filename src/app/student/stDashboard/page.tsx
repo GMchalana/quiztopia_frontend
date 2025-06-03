@@ -27,7 +27,7 @@ export default function StDashboard() {
         setFilteredModules(data); // Initialize filtered modules with all modules
       })
       .catch(err => console.error('Failed to fetch modules:', err));
-  }, []);
+  }, [baseUrl]);
 
   // Filter modules based on search term
   useEffect(() => {
@@ -41,35 +41,35 @@ export default function StDashboard() {
     }
   }, [searchTerm, modules]);
 
-  const handleDelete = (moduleId: number) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'This will permanently delete the module!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch(`${baseUrl}/modules/delete-module/${moduleId}`, {
-            method: 'DELETE',
-          });
+  // const handleDelete = (moduleId: number) => {
+  //   Swal.fire({
+  //     title: 'Are you sure?',
+  //     text: 'This will permanently delete the module!',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#d33',
+  //     cancelButtonColor: '#3085d6',
+  //     confirmButtonText: 'Yes, delete it!',
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         const response = await fetch(`${baseUrl}/modules/delete-module/${moduleId}`, {
+  //           method: 'DELETE',
+  //         });
 
-          if (!response.ok) throw new Error('Delete failed');
+  //         if (!response.ok) throw new Error('Delete failed');
 
-          setModules(prev => prev.filter(module => module.id !== moduleId));
-          setFilteredModules(prev => prev.filter(module => module.id !== moduleId));
+  //         setModules(prev => prev.filter(module => module.id !== moduleId));
+  //         setFilteredModules(prev => prev.filter(module => module.id !== moduleId));
 
-          Swal.fire('Deleted!', 'Module has been deleted.', 'success');
-        } catch (error) {
-          console.error('Delete failed:', error);
-          Swal.fire('Error!', 'Failed to delete the module.', 'error');
-        }
-      }
-    });
-  };
+  //         Swal.fire('Deleted!', 'Module has been deleted.', 'success');
+  //       } catch (error) {
+  //         console.error('Delete failed:', error);
+  //         Swal.fire('Error!', 'Failed to delete the module.', 'error');
+  //       }
+  //     }
+  //   });
+  // };
 
   return (
     <div className="p-6 ">

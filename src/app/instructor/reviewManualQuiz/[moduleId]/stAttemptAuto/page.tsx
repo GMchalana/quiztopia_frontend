@@ -50,7 +50,7 @@ export default function ModuleAttemptsPage() {
     if (moduleId) {
       fetchData();
     }
-  }, [moduleId]);
+  }, [baseUrl, moduleId]);
 
   if (loading) {
     return (

@@ -21,7 +21,7 @@ export default function DashboardPage() {
       .then(res => res.json())
       .then(data => setModules(data))
       .catch(err => console.error('Failed to fetch modules:', err));
-  }, []);
+  }, [baseUrl]);
 
   const handleDelete = (moduleId: number) => {
     Swal.fire({

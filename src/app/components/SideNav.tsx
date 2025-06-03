@@ -14,13 +14,14 @@ import {
   faLayerGroup, 
   faBook, 
   faSignOutAlt,
-  faTrash, // Added for your dashboard icon example
   faFileImage
 } from '@fortawesome/free-solid-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
 
 type NavItem = {
   href: string;
-  icon: any;
+  icon: IconDefinition;
   label: string;
   children?: NavItem[];
 };

@@ -13,7 +13,7 @@ interface Question {
   sampleAnswer: string;
   studentAnswer: string;
   isGraded: boolean;
-  isCorrect: any;
+  isCorrect: boolean | number | null; // ✅ replaced `any` with specific types
   submittedAt: string;
 }
 
@@ -45,35 +45,35 @@ export default function ReviewAttemptPage() {
   useEffect(() => {
     const fetchAttemptDetails = async () => {
       try {
-        const res = await fetch(
-          `${baseUrl}/review/get-manual-selected-attempt/14`
-        );
+        const res = await fetch(`${baseUrl}/review/get-manual-selected-attempt/${params.attemptId}`);
         if (!res.ok) throw new Error('Failed to fetch attempt details');
         const data = await res.json();
         setAttemptDetails(data);
       } catch (err) {
-        setError((err as Error).message);
+        setError((err as Error).message); // ✅ Cast `err` instead of using `any`
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAttemptDetails();
-  }, [params.attemptId]);
+    if (baseUrl) {
+      fetchAttemptDetails();
+    }
+  }, [baseUrl, params.attemptId]); // ✅ Added `baseUrl` to dependency array
 
-  const handleGradeChange = (questionId: number, isCorrect: any) => {
+  const handleGradeChange = (questionId: number, isCorrect: boolean | number) => {
     if (!attemptDetails) return;
 
     setAttemptDetails(prev => {
       if (!prev) return null;
-      
-      const updatedQuestions = prev.questions.map(q => 
-        q.questionId === questionId 
-          ? { ...q, isCorrect, isGraded: true } 
+
+      const updatedQuestions = prev.questions.map(q =>
+        q.questionId === questionId
+          ? { ...q, isCorrect, isGraded: true }
           : q
       );
 
-      const correctAnswers = updatedQuestions.filter(q => q.isCorrect === true).length;
+      const correctAnswers = updatedQuestions.filter(q => q.isCorrect === true || q.isCorrect === 1).length;
       const gradedQuestions = updatedQuestions.filter(q => q.isGraded).length;
 
       return {
@@ -83,11 +83,11 @@ export default function ReviewAttemptPage() {
           ...prev.scoreSummary,
           correctAnswers,
           gradedQuestions,
-          percentage: gradedQuestions > 0 
-            ? Math.round((correctAnswers / prev.scoreSummary.totalQuestions) * 100) 
+          percentage: gradedQuestions > 0
+            ? Math.round((correctAnswers / prev.scoreSummary.totalQuestions) * 100)
             : null,
-          gradingStatus: gradedQuestions === prev.scoreSummary.totalQuestions 
-            ? 'Graded' 
+          gradingStatus: gradedQuestions === prev.scoreSummary.totalQuestions
+            ? 'Graded'
             : 'Partially Graded'
         }
       };
@@ -98,43 +98,41 @@ export default function ReviewAttemptPage() {
 
   const handleSaveGrading = async () => {
     if (!attemptDetails || !changesMade) return;
-  
+
     try {
-      // Prepare the request body data
       const requestBody = {
         grades: attemptDetails.questions.map(q => ({
           questionId: q.questionId,
           isCorrect: q.isCorrect
         }))
       };
-  
-      // Log the request body to console
+
       console.log("Request payload:", requestBody);
-  
+
       const res = await fetch(
         `${baseUrl}/review/update-iscorrect-manual/${params.attemptId}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody) // Use the prepared request body
+          body: JSON.stringify(requestBody)
         }
       );
-  
+
       if (!res.ok) throw new Error('Failed to save grading');
-      
+
       setChangesMade(false);
       router.refresh();
-     
-        Swal.fire({
-             icon: 'success',
-             title: 'Reviewed!',
-             text: 'Grading saved successfully!',
-             showConfirmButton: false,
-             timer: 1500
-           });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Reviewed!',
+        text: 'Grading saved successfully!',
+        showConfirmButton: false,
+        timer: 1500
+      });
     } catch (err) {
-      console.error("Error details:", err); // Also log the error details
-      setError((err as Error).message);
+      console.error("Error details:", err);
+      setError((err as Error).message); // ✅ cast instead of using `any`
     }
   };
 
@@ -145,7 +143,7 @@ export default function ReviewAttemptPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link 
+        <Link
           href={`/instructor/reviewManualQuiz/${params.moduleId}/stAttempts`}
           className="flex items-center text-blue-600 hover:text-blue-800"
         >
@@ -177,7 +175,7 @@ export default function ReviewAttemptPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h3 className="font-medium text-gray-700">Student's Answer:</h3>
+                <h3 className="font-medium text-gray-700">Student&apos;s Answer:</h3> {/* ✅ escaped apostrophe */}
                 <div className="bg-gray-50 p-4 rounded border border-gray-200 text-gray-800">
                   {question.studentAnswer}
                 </div>
