@@ -40,12 +40,13 @@ export default function ReviewAttemptPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [changesMade, setChangesMade] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     const fetchAttemptDetails = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3333/api/review/get-manual-selected-attempt/14`
+          `${baseUrl}/review/get-manual-selected-attempt/14`
         );
         if (!res.ok) throw new Error('Failed to fetch attempt details');
         const data = await res.json();
@@ -111,7 +112,7 @@ export default function ReviewAttemptPage() {
       console.log("Request payload:", requestBody);
   
       const res = await fetch(
-        `http://localhost:3333/api/review/update-iscorrect-manual/${params.attemptId}`,
+        `${baseUrl}/review/update-iscorrect-manual/${params.attemptId}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

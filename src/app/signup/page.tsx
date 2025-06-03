@@ -18,6 +18,7 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
+   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const handleInputChange = (e : any) => {
     const { id, value } = e.target;
@@ -46,7 +47,7 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3333/api/auth/sign-up', {
+      const response = await fetch(`${baseUrl}/auth/sign-up`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -13,7 +13,8 @@ interface Attempt {
 }
 
 async function getModuleAttempts(moduleId: string) {
-  const res = await fetch(`http://localhost:3333/api/review/get-all-attemps-for-ins/${moduleId}`, {
+   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const res = await fetch(`${baseUrl}/review/get-all-attemps-for-ins/${moduleId}`, {
     next: { revalidate: 3600 } // Optional: revalidate data every hour
   });
   

@@ -20,6 +20,7 @@ interface Attempt {
 export default function ModuleAttemptsPage() {
   const params = useParams();
   const moduleId = params.moduleId as string;
+   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   
   const [data, setData] = useState<{
     moduleName: string;
@@ -32,7 +33,7 @@ export default function ModuleAttemptsPage() {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3333/api/review/get-all-attemps-for-ins-manual/${moduleId}`
+          `${baseUrl}/review/get-all-attemps-for-ins-manual/${moduleId}`
         );
         if (!res.ok) {
           throw new Error('Failed to fetch attempts');
