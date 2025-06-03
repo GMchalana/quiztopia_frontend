@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
@@ -32,15 +30,15 @@ async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsRespon
   return res.json();
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ moduleId: string }>;
-}) {
+interface PageProps {
+  params: {
+    moduleId: string;
+  };
+}
+
+export default async function Page({ params }: PageProps) {
   try {
-    // Await the params since they are now async
-    const { moduleId } = await params;
-    const { moduleName, attempts } = await getModuleAttempts(moduleId);
+    const { moduleName, attempts } = await getModuleAttempts(params.moduleId);
 
     return (
       <div className="container mx-auto px-4 py-8">
