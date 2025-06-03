@@ -21,7 +21,7 @@ export default function LoginPage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 
-  const handleInputChange = (e : any) => {
+  const handleInputChange = (e :  React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -42,7 +42,7 @@ export default function LoginPage() {
     
   };
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -202,7 +202,7 @@ export default function LoginPage() {
             </form>
 
             <p className="text-md font-Inter mb-8 text-center text-[#888990]">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <button
                 onClick={handleSignupRedirect}
                 className="text-[#F7CA21] hover:text-[#fce280] cursor-pointer"

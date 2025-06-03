@@ -148,7 +148,7 @@ export default function QuizComponent({ moduleId, type, onFinish }: QuizProps) {
       console.error('Error submitting answers:', error);
       Swal.fire('Error', 'Failed to submit answers', 'error');
     }
-  }, [answers, currentQuestionIndex, manualAnswer, moduleId, questions, selectedAnswer, type, userId, baseUrl, onFinish]);
+  }, [answers, currentQuestionIndex, manualAnswer, moduleId, questions, selectedAnswer, type, userId, baseUrl]);
 
 
 useEffect(() => {
