@@ -30,13 +30,11 @@ async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsRespon
   return res.json();
 }
 
-interface PageProps {
-  params: {
-    moduleId: string;
-  };
-}
-
-export default async function Page({ params }: PageProps) {
+export default async function Page({
+  params,
+}: {
+  params: { moduleId: string };
+}) {
   try {
     const { moduleName, attempts } = await getModuleAttempts(params.moduleId);
 
