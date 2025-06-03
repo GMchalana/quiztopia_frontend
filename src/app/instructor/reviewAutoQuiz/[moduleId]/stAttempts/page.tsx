@@ -17,10 +17,16 @@ interface ModuleAttemptsResponse {
   attempts: Attempt[];
 }
 
+interface PageProps {
+  params: {
+    moduleId: string;
+  };
+}
+
 async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsResponse> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(`${baseUrl}/review/get-all-attemps-for-ins/${moduleId}`, {
-    next: { revalidate: 3600 }
+    next: { revalidate: 3600 },
   });
 
   if (!res.ok) {
@@ -30,11 +36,7 @@ async function getModuleAttempts(moduleId: string): Promise<ModuleAttemptsRespon
   return res.json();
 }
 
-export default async function ModuleAttemptsPage({
-  params,
-}: {
-  params: { moduleId: string };
-}) {
+export default async function Page({ params }: PageProps) {
   try {
     const { moduleName, attempts } = await getModuleAttempts(params.moduleId);
 
@@ -66,7 +68,10 @@ export default async function ModuleAttemptsPage({
                       {attempt.score}/{attempt.totalQuestions} were correct
                     </p>
                     <p className="text-sm text-gray-500">
-                      {new Date(attempt.attemptDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(attempt.attemptDate).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 </div>
