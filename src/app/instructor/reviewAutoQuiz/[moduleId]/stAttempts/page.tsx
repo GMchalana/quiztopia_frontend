@@ -52,7 +52,7 @@ export default async function ModuleAttemptsPage({
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="divide-y divide-gray-200">
-            {attempts.map((attempt: Attempt) => (
+            {attempts.map((attempt) => (
               <div key={attempt.attemptId} className="p-4 hover:bg-gray-50">
                 <div className="flex justify-between items-center">
                   <div>
