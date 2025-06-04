@@ -3,7 +3,14 @@
 import { useRouter } from 'next/navigation';
 import QuizComponent from '../../../../components/QuizComponent';
 
-export default function QuizPage({ params }: { params: { moduleId: string, type: string } }) {
+interface QuizPageProps {
+  params: {
+    moduleId: string;
+    type: string;
+  };
+}
+
+export default function QuizPage({ params }: QuizPageProps) {
   const router = useRouter();
 
   const handleFinish = () => {
